@@ -3,8 +3,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.set_page_config(layout="wide", page_title="Just Hexagons Fix")
-st.title("Карта покрытия (Шестиугольники)")
+st.set_page_config(layout="wide", page_title="Bright Hexagons")
+st.title("Карта покрытия (Яркие шестиугольники)")
 
 # 1. КООРДИНАТЫ
 data = [
@@ -20,33 +20,36 @@ df = pd.DataFrame(data)
 df['x'] = df['col'] + 0.5 * (df['row'] % 2)
 df['y'] = -df['row']
 
-# 2. СОЗДАЕМ СЛОИ (БЕЗ НАСТРОЕК)
+# 2. СОЗДАЕМ СЛОИ
 
-# Слой 1: Шестиугольники
+# Слой 1: ОЧЕНЬ ЗАМЕТНЫЕ ШЕСТИУГОЛЬНИКИ
 hex_layer = alt.Chart(df).mark_point(
     shape="hexagon",
-    size=4500,
+    size=7000,          # УВЕЛИЧЕННЫЙ РАЗМЕР
     filled=True,
-    stroke='white',
-    strokeWidth=2,
-    color='grey'
+    stroke='white',     # БЕЛАЯ ОБВОДКА
+    strokeWidth=4,      # ЖИРНАЯ ОБВОДКА
+    color='red',        # ЯРКО-КРАСНЫЙ ЦВЕТ
+    opacity=1           # ПОЛНАЯ НЕПРОЗРАЧНОСТЬ
 ).encode(
     x=alt.X('x:Q', axis=None),
     y=alt.Y('y:Q', axis=None),
     tooltip=['City']
 )
 
-# Слой 2: Текст
+# Слой 2: Текст (с отступом, чтобы не сливался с красным)
 text_layer = alt.Chart(df).mark_text(
-    dy=0, fontWeight='bold', color='white'
+    dy=0,                  # Отступ от центра по Y
+    dx=0,                  # Отступ от центра по X
+    fontWeight='bold',
+    color='white'
 ).encode(
     x=alt.X('x:Q', axis=None),
     y=alt.Y('y:Q', axis=None),
     text='City'
 )
 
-# 3. ОБЪЕДИНЯЕМ И НАСТРАИВАЕМ (ТЕПЕРЬ ПРАВИЛЬНО)
-# Сначала сложение (+), потом properties и configure
+# 3. ОБЪЕДИНЯЕМ И НАСТРАИВАЕМ
 final_chart = (hex_layer + text_layer).properties(
     height=700
 ).configure_view(
@@ -54,4 +57,5 @@ final_chart = (hex_layer + text_layer).properties(
 )
 
 st.altair_chart(final_chart, use_container_width=True)
+st.write("Таблица координат:")
 st.dataframe(df)
