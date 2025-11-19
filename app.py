@@ -9,10 +9,10 @@ st.title("HEX-MODEL 2025")
 
 try:
     df = pd.read_csv('population_geo_v3.csv')
-    
+
     df_target = df[df['Status'] == 'Target']
     df_neutral = df[df['Status'] == 'Neutral']
-    
+
     mid_lat = df['lat'].mean()
     mid_lon = df['lon'].mean()
 
@@ -49,16 +49,14 @@ try:
         bearing=10
     )
 
-    # Убрали map_style="mapbox://..." чтобы избежать проблем с токенами
     r = pdk.Deck(
         layers=[layer_neutral, layer_target],
         initial_view_state=view_state,
-        tooltip={"text": "{Локация}
-Население: {Население}"}
+        tooltip={"text": "{Локация}\nНаселение: {Население}"}  # FIX: Double backslash
     )
 
     st.pydeck_chart(r)
-    
+
     with st.expander("Данные"):
         st.dataframe(df)
 
