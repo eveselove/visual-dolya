@@ -3,10 +3,10 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.set_page_config(layout="wide", page_title="Just Hexagons")
-st.title("Карта покрытия (Просто шестиугольники)")
+st.set_page_config(layout="wide", page_title="Just Hexagons Fix")
+st.title("Карта покрытия (Шестиугольники)")
 
-# 1. КООРДИНАТЫ (Скелет карты)
+# 1. КООРДИНАТЫ
 data = [
     {'City': 'Череповец', 'col': 0, 'row': 0}, {'City': 'Вологда', 'col': 1, 'row': 0},
     {'City': 'Рыбинск', 'col': 0, 'row': 1}, {'City': 'Ярославль', 'col': 1, 'row': 1},
@@ -17,39 +17,41 @@ data = [
     {'City': 'Воронеж', 'col': 0, 'row': 6},
 ]
 df = pd.DataFrame(data)
-
-# 2. РАСЧЕТ КООРДИНАТ
 df['x'] = df['col'] + 0.5 * (df['row'] % 2)
 df['y'] = -df['row']
 
-# 3. ОТРИСОВКА (Только шестиугольники, без цвета по данным)
-chart = alt.Chart(df).mark_point(
+# 2. СОЗДАЕМ СЛОИ (БЕЗ НАСТРОЕК)
+
+# Слой 1: Шестиугольники
+hex_layer = alt.Chart(df).mark_point(
     shape="hexagon",
     size=4500,
     filled=True,
     stroke='white',
     strokeWidth=2,
-    color='grey' # Фиксированный серый цвет для всех
+    color='grey'
 ).encode(
-    x=alt.X('x:Q', axis=None), # :Q для Altair
-    y=alt.Y('y:Q', axis=None), # :Q для Altair
-    tooltip=['City'] # Подсказка только по городу
-).properties(
-    height=700
-).configure_view(
-    strokeWidth=0
+    x=alt.X('x:Q', axis=None),
+    y=alt.Y('y:Q', axis=None),
+    tooltip=['City']
 )
 
-# Добавляем названия городов
-text = alt.Chart(df).mark_text(dy=0, fontWeight='bold', color='white').encode(
+# Слой 2: Текст
+text_layer = alt.Chart(df).mark_text(
+    dy=0, fontWeight='bold', color='white'
+).encode(
     x=alt.X('x:Q', axis=None),
     y=alt.Y('y:Q', axis=None),
     text='City'
 )
 
-final_chart = (chart + text)
+# 3. ОБЪЕДИНЯЕМ И НАСТРАИВАЕМ (ТЕПЕРЬ ПРАВИЛЬНО)
+# Сначала сложение (+), потом properties и configure
+final_chart = (hex_layer + text_layer).properties(
+    height=700
+).configure_view(
+    strokeWidth=0
+)
 
 st.altair_chart(final_chart, use_container_width=True)
-
-st.write("Таблица координат (для проверки):")
-st.dataframe(df[['City', 'x', 'y']])
+st.dataframe(df)
