@@ -47,18 +47,15 @@ if not df.empty:
 
     fig = go.Figure()
     shapes = []
-
-    # СПИСОК "БЕЛЫХ" ГОРОДОВ
     NEUTRAL_CITIES = ["Рязань"]
 
     for index, row in df.iterrows():
-        # Если город в списке нейтральных - красим белым с серой обводкой
         if row[text_col] in NEUTRAL_CITIES:
             color = "#FFFFFF"
-            line_color = "#CCCCCC" # Серая рамка для видимости
+            line_color = "#CCCCCC"
         else:
             color = get_color_hex(row['Население'])
-            line_color = "white" # Обычная белая рамка
+            line_color = "white"
 
         shapes.append(dict(
             type="path",
